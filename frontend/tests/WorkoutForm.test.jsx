@@ -1,0 +1,124 @@
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import WorkoutForm from "../src/components/WorkoutForm";
+
+// mock global fetch
+globalThis.fetch = jest.fn();
+
+describe("WorkoutForm", () => {
+
+  beforeEach(() => {
+    fetch.mockReset();
+  });
+
+  test("renders form elements", () => {
+    render(<WorkoutForm />);
+
+    expect(screen.getByText("Add a New Workout")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Exercise Title/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Load \(in kg\)/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Reps/i)).toBeInTheDocument();
+    expect(screen.getByText(/Add Workout/i)).toBeInTheDocument();
+  });
+
+  test("allows typing in inputs", () => {
+    render(<WorkoutForm />);
+
+    const titleInput = screen.getByLabelText(/Exercise Title/i);
+    const loadInput = screen.getByLabelText(/Load/i);
+    const repsInput = screen.getByLabelText(/Reps/i);
+
+    fireEvent.change(titleInput, { target: { value: "Bench Press" } });
+    fireEvent.change(loadInput, { target: { value: "50" } });
+    fireEvent.change(repsInput, { target: { value: "10" } });
+
+    expect(titleInput.value).toBe("Bench Press");
+    expect(loadInput.value).toBe("50");
+    expect(repsInput.value).toBe("10");
+  });
+
+  test("submits form and resets fields on success", async () => {
+    // mock successful response
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        _id: "1",
+        title: "Bench Press",
+        load: 50,
+        reps: 10
+      })
+    });
+
+    render(<WorkoutForm />);
+
+    const titleInput = screen.getByLabelText(/Exercise Title/i);
+    const loadInput = screen.getByLabelText(/Load/i);
+    const repsInput = screen.getByLabelText(/Reps/i);
+    const button = screen.getByText(/Add Workout/i);
+
+    // fill form
+    fireEvent.change(titleInput, { target: { value: "Bench Press" } });
+    fireEvent.change(loadInput, { target: { value: "50" } });
+    fireEvent.change(repsInput, { target: { value: "10" } });
+
+    fireEvent.click(button);
+
+    // expect correct fetch request
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        "/api/workouts",
+        expect.objectContaining({
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: "Bench Press",
+            load: "50",
+            reps: "10"
+          })
+        })
+      );
+    });
+
+    // expect form reset
+    await waitFor(() => {
+      expect(titleInput.value).toBe("");
+      expect(loadInput.value).toBe("");
+      expect(repsInput.value).toBe("");
+    });
+
+    // no error displayed
+    expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
+  });
+
+  test("shows error on failed submit and does NOT reset fields", async () => {
+    // mock error response
+    fetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        error: "All fields must be filled"
+      })
+    });
+
+    render(<WorkoutForm />);
+
+    const titleInput = screen.getByLabelText(/Exercise Title/i);
+    const loadInput = screen.getByLabelText(/Load/i);
+    const button = screen.getByText(/Add Workout/i);
+
+    fireEvent.change(titleInput, { target: { value: "Squat" } });
+    fireEvent.change(loadInput, { target: { value: "100" } });
+
+    fireEvent.click(button);
+
+    // expect fetch call
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+
+    // expect error
+    expect(await screen.findByText("All fields must be filled")).toBeInTheDocument();
+
+    // fields should NOT be reset
+    expect(titleInput.value).toBe("Squat");
+    expect(loadInput.value).toBe("100");
+  });
+});
