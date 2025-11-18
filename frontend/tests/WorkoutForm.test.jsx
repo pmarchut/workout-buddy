@@ -1,12 +1,22 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import WorkoutForm from "../src/components/WorkoutForm";
 
-// mock global fetch
+let mockDispatch;
+
+// mock hook
+jest.mock("../src/hooks/useWorkoutsContext", () => ({
+  useWorkoutsContext: () => ({
+    dispatch: mockDispatch
+  })
+}));
+
+// mock fetch
 globalThis.fetch = jest.fn();
 
 describe("WorkoutForm", () => {
 
   beforeEach(() => {
+    mockDispatch = jest.fn();      // nowy mock PER TEST
     fetch.mockReset();
   });
 
@@ -36,7 +46,7 @@ describe("WorkoutForm", () => {
     expect(repsInput.value).toBe("10");
   });
 
-  test("submits form and resets fields on success", async () => {
+  test("submits form, resets fields and dispatches on success", async () => {
     // mock successful response
     fetch.mockResolvedValueOnce({
       ok: true,
@@ -50,19 +60,19 @@ describe("WorkoutForm", () => {
 
     render(<WorkoutForm />);
 
-    const titleInput = screen.getByLabelText(/Exercise Title/i);
-    const loadInput = screen.getByLabelText(/Load/i);
-    const repsInput = screen.getByLabelText(/Reps/i);
-    const button = screen.getByText(/Add Workout/i);
+    fireEvent.change(screen.getByLabelText(/Exercise Title/i), {
+      target: { value: "Bench Press" }
+    });
+    fireEvent.change(screen.getByLabelText(/Load/i), {
+      target: { value: "50" }
+    });
+    fireEvent.change(screen.getByLabelText(/Reps/i), {
+      target: { value: "10" }
+    });
 
-    // fill form
-    fireEvent.change(titleInput, { target: { value: "Bench Press" } });
-    fireEvent.change(loadInput, { target: { value: "50" } });
-    fireEvent.change(repsInput, { target: { value: "10" } });
+    fireEvent.click(screen.getByText(/Add Workout/i));
 
-    fireEvent.click(button);
-
-    // expect correct fetch request
+    // expect fetch call
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
         "/api/workouts",
@@ -80,13 +90,21 @@ describe("WorkoutForm", () => {
 
     // expect form reset
     await waitFor(() => {
-      expect(titleInput.value).toBe("");
-      expect(loadInput.value).toBe("");
-      expect(repsInput.value).toBe("");
+      expect(screen.getByLabelText(/Exercise Title/i).value).toBe("");
+      expect(screen.getByLabelText(/Load/i).value).toBe("");
+      expect(screen.getByLabelText(/Reps/i).value).toBe("");
     });
 
-    // no error displayed
-    expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
+    // ✨ expect dispatch call
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: "CREATE_WORKOUT",
+      payload: {
+        _id: "1",
+        title: "Bench Press",
+        load: 50,
+        reps: 10
+      }
+    });
   });
 
   test("shows error on failed submit and does NOT reset fields", async () => {
@@ -120,5 +138,8 @@ describe("WorkoutForm", () => {
     // fields should NOT be reset
     expect(titleInput.value).toBe("Squat");
     expect(loadInput.value).toBe("100");
+
+    // ✨ dispatch should NOT be called
+    expect(mockDispatch).not.toHaveBeenCalled();
   });
 });
