@@ -89,4 +89,11 @@ describe("WorkoutDetails", () => {
 
     expect(mockDispatch).not.toHaveBeenCalled();
   });
+
+  test("renders formatted date using formatDistanceToNow", () => {
+    render(<WorkoutDetails workout={workout} />);
+
+    // Szukamy fragmentu, który zawsze występuje
+    expect(screen.getByText(/ago/i)).toBeInTheDocument();
+  });
 });
