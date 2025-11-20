@@ -112,7 +112,8 @@ describe("WorkoutForm", () => {
     fetch.mockResolvedValueOnce({
       ok: false,
       json: async () => ({
-        error: "All fields must be filled"
+        error: "All fields must be filled",
+        emptyFields: ["reps"]
       })
     });
 
@@ -141,5 +142,34 @@ describe("WorkoutForm", () => {
 
     // ✨ dispatch should NOT be called
     expect(mockDispatch).not.toHaveBeenCalled();
+  });
+
+  test("adds error class to invalid fields on failed submit", async () => {
+    // backend zwraca, że tytuł i load są puste
+    fetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        error: "Fields cannot be empty",
+        emptyFields: ["title", "load"]
+      })
+    });
+
+    render(<WorkoutForm />);
+
+    fireEvent.click(screen.getByText(/Add Workout/i));
+
+    const titleInput = screen.getByLabelText(/Exercise Title/i);
+    const loadInput = screen.getByLabelText(/Load/i);
+    const repsInput = screen.getByLabelText(/Reps/i);
+
+    // czekamy aż component doda klasy
+    await waitFor(() => {
+      expect(titleInput.classList.contains("error")).toBe(true);
+      expect(loadInput.classList.contains("error")).toBe(true);
+      expect(repsInput.classList.contains("error")).toBe(false); // nie było go w emptyFields
+    });
+
+    // error message
+    expect(screen.getByText("Fields cannot be empty")).toBeInTheDocument();
   });
 });
