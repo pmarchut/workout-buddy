@@ -10,6 +10,15 @@ jest.mock("../src/hooks/useWorkoutsContext", () => ({
   })
 }));
 
+jest.mock("../src/hooks/useAuthContext", () => ({
+  useAuthContext: () => ({
+    user: {
+      email: "test@test.com",
+      token: "TEST_TOKEN_123"
+    }
+  })
+}));
+
 // mock fetch
 globalThis.fetch = jest.fn();
 
@@ -78,7 +87,10 @@ describe("WorkoutForm", () => {
         "/api/workouts",
         expect.objectContaining({
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Authorization": "Bearer TEST_TOKEN_123",
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({
             title: "Bench Press",
             load: "50",

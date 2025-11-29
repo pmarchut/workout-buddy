@@ -10,6 +10,15 @@ jest.mock("../src/hooks/useWorkoutsContext", () => ({
   })
 }));
 
+jest.mock("../src/hooks/useAuthContext", () => ({
+  useAuthContext: () => ({
+    user: {
+      email: "test@test.com",
+      token: "TEST_TOKEN_123"
+    }
+  })
+}));
+
 // mock fetch
 globalThis.fetch = jest.fn();
 
@@ -50,7 +59,12 @@ describe("WorkoutDetails", () => {
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
         "/api/workouts/123",
-        { method: "DELETE" }
+        { 
+          method: "DELETE",
+          headers: {
+            "Authorization": "Bearer TEST_TOKEN_123"
+          }, 
+        }
       );
     });
   });
