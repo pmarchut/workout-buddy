@@ -3,6 +3,8 @@ import { useWorkoutsContext } from "../hooks/useWorkoutsContext"
 import { useAuthContext } from "../hooks/useAuthContext"
 
 function WorkoutForm() {
+  const API_URL = import.meta.env.VITE_API_URL
+
   const { dispatch } = useWorkoutsContext()
   const {user} = useAuthContext()
 
@@ -22,7 +24,7 @@ function WorkoutForm() {
 
     const workout = { title, load, reps }
 
-    const response = await fetch('/api/workouts', {
+    const response = await fetch(`${API_URL}/api/workouts`, {
       method: 'POST',
       body: JSON.stringify(workout),
       headers: {

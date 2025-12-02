@@ -5,12 +5,14 @@ import { useWorkoutsContext } from "../hooks/useWorkoutsContext"
 import { useAuthContext } from "../hooks/useAuthContext"
 
 function Home() {
+  const API_URL = import.meta.env.VITE_API_URL
+
   const {workouts, dispatch} = useWorkoutsContext()
   const {user} = useAuthContext()
 
   useEffect(() => {
     const fetchWorkouts = async () => {
-      const response = await fetch('/api/workouts', {
+      const response = await fetch(`${API_URL}/api/workouts`, {
         headers: {
           'Authorization': `Bearer ${user.token}`
         }
@@ -25,7 +27,7 @@ function Home() {
     if (user) {
       fetchWorkouts()
     }
-  }, [dispatch, user])
+  }, [API_URL, dispatch, user])
 
   return (
     <div className="home">

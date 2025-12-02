@@ -130,3 +130,19 @@ form.signup, form.login {
   background: #fff;
   border-radius: 4px;
 }
+
+@media (max-width: 640px) {
+  header .container h1 {
+    font-size: 1.2rem; /* smaller h1 on very small screens */
+  }
+
+  .home {
+    grid-template-columns: 1fr; /* stack columns */
+    gap: 20px; /* much smaller gap */
+  }
+
+  .workout-details {
+    margin: 10px;
+    padding: 16px;
+  }
+}
