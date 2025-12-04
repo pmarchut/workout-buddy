@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react'
 import { useSignup } from '../src/hooks/useSignup'
 import { useAuthContext } from '../src/hooks/useAuthContext'
+import { API_URL } from "../src/config";
 
 // mockowanie kontekstu
 jest.mock('../src/hooks/useAuthContext')
@@ -50,7 +51,7 @@ describe('useSignup hook', () => {
       await result.current.signup('john@example.com', 'password123')
     })
 
-    expect(fetch).toHaveBeenCalledWith('/api/users/signup', {
+    expect(fetch).toHaveBeenCalledWith(`${API_URL}/api/users/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

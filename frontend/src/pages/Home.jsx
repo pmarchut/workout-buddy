@@ -3,10 +3,9 @@ import WorkoutDetails from "../components/WorkoutDetails"
 import WorkoutForm from "../components/WorkoutForm"
 import { useWorkoutsContext } from "../hooks/useWorkoutsContext"
 import { useAuthContext } from "../hooks/useAuthContext"
+import { API_URL } from "../config";
 
 function Home() {
-  const API_URL = import.meta.env.VITE_API_URL
-
   const {workouts, dispatch} = useWorkoutsContext()
   const {user} = useAuthContext()
 

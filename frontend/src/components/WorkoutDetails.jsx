@@ -4,9 +4,9 @@ import { useWorkoutsContext } from "../hooks/useWorkoutsContext"
 // date fns
 import { formatDistanceToNow } from "date-fns";
 
-function WorkoutDetails({ workout }) {
-  const API_URL = import.meta.env.VITE_API_URL
+import { API_URL } from "../config";
 
+function WorkoutDetails({ workout }) {
   const { dispatch } = useWorkoutsContext()
   const {user} = useAuthContext()
 
@@ -15,7 +15,7 @@ function WorkoutDetails({ workout }) {
       return
     }
 
-    const response = await fetch(`${API_URL}/api/workouts` + workout._id, {
+    const response = await fetch(`${API_URL}/api/workouts/` + workout._id, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${user.token}`

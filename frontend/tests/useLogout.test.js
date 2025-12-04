@@ -3,9 +3,16 @@ import { useLogout } from "../src/hooks/useLogout";
 
 // Mock useAuthContext
 const mockDispatch = jest.fn();
+const mockWorkoutsDispatch = jest.fn();
+
 jest.mock("../src/hooks/useAuthContext", () => ({
   useAuthContext: () => ({
     dispatch: mockDispatch
+  })
+}));
+jest.mock("../src/hooks/useWorkoutsContext", () => ({
+  useWorkoutsContext: () => ({
+    dispatch: mockWorkoutsDispatch
   })
 }));
 

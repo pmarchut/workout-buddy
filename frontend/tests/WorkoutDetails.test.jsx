@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import WorkoutDetails from "../src/components/WorkoutDetails";
+import { API_URL } from "../src/config";
 
 let mockDispatch;
 
@@ -58,7 +59,7 @@ describe("WorkoutDetails", () => {
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
-        "/api/workouts/123",
+        `${API_URL}/api/workouts/123`,
         { 
           method: "DELETE",
           headers: {

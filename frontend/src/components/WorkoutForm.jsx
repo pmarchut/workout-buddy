@@ -1,10 +1,9 @@
 import { useState } from "react"
 import { useWorkoutsContext } from "../hooks/useWorkoutsContext"
 import { useAuthContext } from "../hooks/useAuthContext"
+import { API_URL } from "../config";
 
 function WorkoutForm() {
-  const API_URL = import.meta.env.VITE_API_URL
-
   const { dispatch } = useWorkoutsContext()
   const {user} = useAuthContext()
 

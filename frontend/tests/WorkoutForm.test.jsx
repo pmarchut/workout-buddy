@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import WorkoutForm from "../src/components/WorkoutForm";
+import { API_URL } from "../src/config";
 
 let mockDispatch;
 
@@ -84,7 +85,7 @@ describe("WorkoutForm", () => {
     // expect fetch call
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
-        "/api/workouts",
+        `${API_URL}/api/workouts`,
         expect.objectContaining({
           method: "POST",
           headers: { 

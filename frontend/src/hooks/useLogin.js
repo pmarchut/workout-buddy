@@ -1,9 +1,8 @@
 import { useState } from "react"
 import { useAuthContext } from "./useAuthContext"
+import { API_URL } from "../config";
 
 export const useLogin = () => {
-    const API_URL = import.meta.env.VITE_API_URL
-
     const [error, setError] = useState(null)
     const [isLoading, setIsLoading] = useState(null)
     const { dispatch } = useAuthContext()

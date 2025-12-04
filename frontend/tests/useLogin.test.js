@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { useLogin } from "../src/hooks/useLogin";
+import { API_URL } from "../src/config";
 
 // mock kontekstu Auth
 const mockDispatch = jest.fn();
@@ -39,7 +40,7 @@ describe("useLogin hook", () => {
 
     // fetch called correctly
     expect(fetch).toHaveBeenCalledWith(
-      "/api/users/login",
+      `${API_URL}/api/users/login`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
