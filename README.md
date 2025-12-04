@@ -1,3 +1,3 @@
 # workout-buddy
 
-Site: https://workout-buddy-fhkn.onrender.com
+Site: https://workout-buddy-liard.vercel.app
